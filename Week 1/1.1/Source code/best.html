@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="description" content="Tica's Tacos">
+	<meta name="keywords" content="Tacos, Tica">
+    <meta name="author" content="Thanh Minh">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" type="text/css" href="best.css">
+	<script type="text/javascript" src="best.js"></script>
+	<title>Order</title>
+</head>
+
+<body>
+
+	<nav>
+		<a href="index.html">Home</a>
+		<a href="register.html">Register</a>
+		<a href="order.html" class="active">Order</a>
+		<a href="features.html">Features</a>
+	</nav>
+
+<form method="post" action="http://mercury.swin.edu.au/it000000/cos10005/surveytest.php" onsubmit="form">
+<fieldset>
+      <h1>Ordering form</h1> <br><br>
+
+      <label>Delivery</label>
+      <input type="checkbox" id="DoPC" onclick="myDoP()">
+      <label>Pick up</label>
+       <input type="checkbox"><br><br>
+	<p id="DoP"><label>Delivery address</label>
+	<input type="text" name="Delivery" placeholder="Delivery address" id="dadd"><br>
+	<label>Delivery Postal Code</label>
+	<input type="text" id="dpost" placeholder="Delivery Postal Code"><br><br>
+	</p>
+
+	<label>Billing address</label>
+	<input type="text" name="Billing address" id="badd" placeholder="Billing address"><br>
+	<label>Billing Postal Code</label>
+	<input type="text" name="Billing Postal Code" id="bpost" placeholder="Billing Postal Code"><br><input id="duplicate" type="checkbox" name="duplicate" value="Duplicate" onclick="copy(event)" />Same as delivery address
+    	<br>
+
+	<label>Contact number</label>
+	<input type="text" name="Contact number" placeholder="Contact number"><br><br>
+
+	<label>Email for receipt</label>
+	<input type="Email" name="Email" placeholder="Email for receipt"><br><br>
+
+	<label>Pay online</label>
+      <input type="checkbox" id="PoPC" onclick="myPoP()">
+      <label>Pay on pick up</label>
+       <input type="checkbox"><br><br>
+	<p id="PoP">
+	<input type="radio" name="Visa"><label for="Visa">Visa</label>
+	<input type="radio" name="Mastercard"><label for="Mastercard">Mastercard</label>
+	<input type="radio" name="American Express"><label for="American Express">American Express</label>
+
+	<label>Credit card information</label>
+	<input type="text" name="CCinfo" placeholder="Creditcard information"><br><br>
+	</p>
+
+	 <input type="submit" value="Submit" class="center" />
+    <input type="reset" value="Clear" class="center" />
+</fieldset>
+</form>
+
+
+
+</body>
+<footer> Thank you for using our service! </footer>
+</html>
+
