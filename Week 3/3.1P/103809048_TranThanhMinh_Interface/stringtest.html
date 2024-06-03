@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>3.1P String test</title>
+    </head>
+
+    <body>
+        <div id="app">
+            <h1>String Test</h1>
+            <p>Please enter your name:</p>
+            <input type="text" v-model="strName">
+            <p v-if="strName.toLowerCase() == 'minh'">Awesome name!</p>
+            <p v-if="strName.toLowerCase() !== 'minh' && strName != ''">{{strName}} is not my name</p>
+        </div>
+        <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+        <script>Vue.createApp({
+                data() {
+                    return {
+                        strName: "",
+                    };
+                },
+            }).mount("#app");</script>
+    </body>
+
+</html>
