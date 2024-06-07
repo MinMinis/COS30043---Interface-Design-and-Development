@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>6.1C Registration Form</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+            integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    </head>
+
+    <body>
+        <div id="app" class="container">
+            <h1 class="text-center">Registration Form</h1>
+            <form method="post" action="http://mercury.swin.edu.au/it000000/formtest.php" @submit="checkForm"
+                novalidate>
+                <div class="mb-3">
+                    <label for="fname" class="form-label">First Name</label>
+                    <input type="text" class="form-control" id="fname" name="fname" v-model="form.fname">
+                    <p v-if="error.fname" class="text-danger">{{ error.fname }}</p>
+                </div>
+                <div class="mb-3">
+                    <label for="lname" class="form-label">Last Name</label>
+                    <input type="text" class="form-control" id="lname" name="lname" v-model="form.lname">
+                    <p v-if="error.lname" class="text-danger">{{ error.lname }}</p>
+                </div>
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" v-model="form.username">
+                    <p v-if="error.username" class="text-danger">{{ error.username }}</p>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" v-model="form.password">
+                    <p v-if="error.password" class="text-danger">{{ error.password }}</p>
+                </div>
+                <div class="mb-3">
+                    <label for="confirmPassword" class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" v-model="form.confirmPassword">
+                    <p v-if="error.confirmpassword" class="text-danger">{{ error.confirmPassword }}</p>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" v-model="form.email">
+                    <p v-if="error.email" class="text-danger">{{ error.email }}</p>
+                </div>
+                <div class="mb-3">
+                    <label for="street" class="form-label">Street</label>
+                    <input type="text" class="form-control" id="street" name="street" v-model="form.street">
+                    <p v-if="error.street" class="text-danger">{{ error.street }}</p>
+                </div>
+                <div class="mb-3">
+                    <label for="suburb" class="form-label">Suburb</label>
+                    <input type="text" class="form-control" id="suburb" name="suburb" v-model="form.suburb">
+                    <p v-if="error.suburb" class="text-danger">{{ error.suburb }}</p>
+                </div>
+                <div class="mb-3">
+                    <label for="postcode" class="form-label">Postcode</label>
+                    <input type="text" class="form-control" id="postcode" name="postcode" v-model="form.postcode">
+                    <p v-if="error.postcode" class="text-danger">{{ error.postcode }}</p>
+                </div>
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Mobile number</label>
+                    <input type="text" class="form-control" id="phone" name="phone" v-model="form.phone">
+                    <p v-if="error.phone" class="text-danger">{{ error.phone }}</p>
+                </div>
+                <div class="mb-3">
+                    <input type="checkbox" class="form-check-input mx-2 mt-1" name="termandcondition" id="termsandcondition"
+                        v-model="form.termsandcondition">
+                    <label for="termsandcondition" class="form-check-label">Terms and Conditions</label>
+                    <p v-if="form.termsandcondition">I agree to the terms and conditions</p>
+                    <p v-if="error.termsandcondition" class="text-danger">{{ error.termsandcondition }}</p>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+        <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+            crossorigin="anonymous"></script>
+        <script src="js/appregistration2.js">
+        </script>
+    </body>
+
+</html>
