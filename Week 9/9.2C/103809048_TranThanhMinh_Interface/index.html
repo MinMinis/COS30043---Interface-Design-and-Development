@@ -4,7 +4,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>9.1P</title>
+        <title>9.2C</title>
         <script type="module" src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
         <script type="module" src="https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js"></script>
         <script type="module" src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
@@ -15,10 +15,7 @@
     <body>
         <div id="app" class="container">
             <nav-bar></nav-bar>
-            <router-view v-slot="{ Component }">
-                <keep-alive>
-                    <component :is="Component" />
-                </keep-alive>
+            <router-view>
             </router-view>
 
         </div>
