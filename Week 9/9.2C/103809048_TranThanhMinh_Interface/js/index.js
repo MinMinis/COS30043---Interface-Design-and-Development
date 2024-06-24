@@ -168,21 +168,25 @@ app.component("Dashboard", {
     </div>
   `,
 });
-app.component("ViewStudents", {
+app.component("ViewUnits", {
   template: `
     <div class="container">
-      <h2>View Students</h2>
-      <table class="table table-bordered table-striped mt-5" v-if="students > 0">
+      <h2>View Units</h2>
+      <table class="table table-bordered table-striped mt-5" v-if="units > 0">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Marks</th>
+            <th>Code</th>
+            <th>Description</th>
+            <th>Credit Points</th>
+            <th>Type</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(student, index) in students" :key="index">
-            <td>{{ student.name }}</td>
-            <td>{{ student.marks }}</td>
+          <tr v-for="(unit, index) in units" :key="index">
+            <td>{{ unit.name }}</td>
+            <td>{{ unit.desc }}</td>
+            <td>{{ unit.cp }}</td>
+            <td>{{ unit.type }}</td>
           </tr>
         </tbody>
       </table>
@@ -191,12 +195,50 @@ app.component("ViewStudents", {
   `,
   data() {
     return {
-      students: [],
+      units: [],
       error: "",
     };
   },
   mounted() {
-    console.log("ViewStudents component mounted"); // Ensure this logs when the component is mounted
+    console.log("ViewUnits component mounted"); // Ensure this logs when the component is mounted
+    this.error = "";
+    fetch(api + "/units")
+      .then((response) => {
+        if (!response.ok) {
+          this.error = "Network response was not ok";
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data === null) {
+          console.log("No data returned");
+          this.error = "No data returned";
+        } else {
+          this.units = data; // Assuming data is an array of units
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching units:", error);
+        this.error = "Failed to fetch units. Please try again";
+      });
+  },
+});
+
+app.component("CreateUnit", {
+  template: `
+    <div class="container">
+      <h2>Create Unit</h2>
+      <!-- Form for creating a new student -->
+    </div>
+  `,
+  data() {
+    return {
+      input: { name: "", age: "" },
+      error: "",
+    };
+  },
+  mounted() {
+    console.log("ViewUnits component mounted"); // Ensure this logs when the component is mounted
     this.error = "";
     fetch(api + "/students")
       .then((response) => {
@@ -220,19 +262,10 @@ app.component("ViewStudents", {
   },
 });
 
-app.component("CreateStudent", {
+app.component("UpdateUnit", {
   template: `
     <div class="container">
-      <h2>Create Student</h2>
-      <!-- Form for creating a new student -->
-    </div>
-  `,
-});
-
-app.component("UpdateStudent", {
-  template: `
-    <div class="container">
-      <h2>Update Student</h2>
+      <h2>Update Unit</h2>
       <!-- Form for updating student details -->
       <p>Editing student: {{ students[id].name }}</p>
     </div>
@@ -248,10 +281,10 @@ app.component("UpdateStudent", {
   },
 });
 
-app.component("DeleteStudent", {
+app.component("DeleteUnit", {
   template: `
     <div class="container">
-      <h2>Delete Student</h2>
+      <h2>Delete Unit</h2>
       <p>Are you sure you want to delete {{ students[id].name }}?</p>
       <!-- Delete confirmation button -->
     </div>
@@ -278,24 +311,24 @@ const router = VueRouter.createRouter({
       redirect: "/dashboard/view",
       children: [
         {
-          name: "ViewStudents",
+          name: "ViewUnits",
           path: "view",
-          component: app.component("ViewStudents"),
+          component: app.component("ViewUnits"),
         },
         {
           path: "create",
-          component: app.component("CreateStudent"),
-          name: "CreateStudent",
+          component: app.component("CreateUnit"),
+          name: "CreateUnit",
         },
         {
           path: "update",
-          component: app.component("UpdateStudent"),
-          name: "UpdateStudent",
+          component: app.component("UpdateUnit"),
+          name: "UpdateUnit",
         },
         {
           path: "delete",
-          component: app.component("DeleteStudent"),
-          name: "DeleteStudent",
+          component: app.component("DeleteUnit"),
+          name: "DeleteUnit",
         },
       ],
     },
