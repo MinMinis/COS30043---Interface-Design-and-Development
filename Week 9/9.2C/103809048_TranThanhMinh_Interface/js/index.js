@@ -1,4 +1,4 @@
-const api = "localhost:8000";
+const api = "http://localhost:8000";
 var studMarks = [
   { name: "John", marks: 80 },
   { name: "Ally", marks: 75 },
@@ -66,11 +66,11 @@ app.component("Login", {
               <h5 class="card-title text-center">Login</h5>
               <form @submit.prevent="login">
                 <div class="mb-3">
-                  <label for="username" class="form-label">Username</label>
+                  <label class="form-label" for="username" class="form-label">Username</label>
                   <input type="text" class="form-control" id="username" v-model="input.username">
                 </div>
                 <div class="mb-3">
-                  <label for="password" class="form-label">Password</label>
+                  <label class="form-label" for="password" class="form-label">Password</label>
                   <input type="password" class="form-control" id="password" v-model="input.password">
                 </div>
                 <p class="alert-danger text-center" v-if="!valid.status">{{ valid.message }}</p>
@@ -226,77 +226,242 @@ app.component("ViewUnits", {
 
 app.component("CreateUnit", {
   template: `
-    <div class="container">
-      <h2>Create Unit</h2>
-      <!-- Form for creating a new student -->
+  <div class="row row-cols-6 w-auto">
+    <div class="col container-fluid w-50">
+      <h2 class="text-center">Create Unit</h2>
+      <form @submit.prevent="submitForm">
+        <div class="form-group">
+          <label class="form-label" for="code">Code:</label>
+          <input type="text" v-model="input.code" class="form-control" id="code" >
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="desc">Description:</label>
+          <input type="text" v-model="input.desc" class="form-control" id="desc" >
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="cp">Credit Points:</label>
+          <input type="number" step="0.1" v-model="input.cp" class="form-control" id="cp" >
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="type">Type:</label>
+          <select v-model="input.type" class="form-control" id="type" >
+          <option value="" disabled>Select type</option>
+          <option value="core">Core</option>
+          <option value="system analysis">System Analysis</option>
+          <option value="software development">Software Development</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary mt-4">Create Unit</button>
+        </form>
+      </div>
+      <div class="col container-fluid w-50">
+        <h3>Output Message</h3>
+        <p>Status code: {{output.status}}</p>
+        <p>Response: {{output.response}}</p>
+      </div>
     </div>
   `,
   data() {
     return {
-      input: { name: "", age: "" },
-      error: "",
+      input: { code: "", desc: "", cp: "", type: "" },
+      output: { status: "", response: "" },
     };
   },
+  methods: {
+    submitForm() {
+      this.output.status = "";
+      this.output.response = "";
+      if (
+        !this.input.code ||
+        !this.input.desc ||
+        !this.input.cp ||
+        !this.input.type
+      ) {
+        this.output.response = "All fields are .";
+        return;
+      }
+      const payload = {
+        code: this.input.code,
+        desc: this.input.desc,
+        cp: parseFloat(this.input.cp),
+        type: this.input.type,
+      };
+      fetch(api + "/units", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            this.output.response = "Network response was not ok";
+          }
+          this.output.status = 200;
+          return response.json();
+        })
+        .then((data) => {
+          this.output.response = data;
+          console.log("Unit created:", data);
+          this.input = { code: "", desc: "", cp: "", type: "" };
+        })
+        .catch((error) => {
+          this.output.status = "403";
+          this.output.response = "Failed to create unit. Please try again";
+        });
+    },
+  },
   mounted() {
-    console.log("ViewUnits component mounted"); // Ensure this logs when the component is mounted
-    this.error = "";
-    fetch(api + "/students")
-      .then((response) => {
-        if (!response.ok) {
-          this.error = "Network response was not ok";
-        }
-        return response.json();
-      })
-      .then((data) => {
-        if (data === null) {
-          console.log("No data returned");
-          this.error = "No data returned";
-        } else {
-          this.students = data; // Assuming data is an array of students
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching students:", error);
-        this.error = "Failed to fetch students. Please try again";
-      });
+    this.input.type = "core";
+    this.input.cp = "12.5";
   },
 });
 
 app.component("UpdateUnit", {
   template: `
-    <div class="container">
-      <h2>Update Unit</h2>
-      <!-- Form for updating student details -->
-      <p>Editing student: {{ students[id].name }}</p>
+  <div class="row row-cols-6 w-auto">
+    <div class="col container-fluid w-50">
+      <h2 class="text-center">Update Unit</h2>
+      <form @submit.prevent="submitForm">
+        <div class="form-group">
+          <label class="form-label" for="code">Enter Unit Code for updating:</label>
+          <input type="text" v-model="input.code" class="form-control" id="code" >
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="desc">Description:</label>
+          <input type="text" v-model="input.desc" class="form-control" id="desc" >
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="cp">Credit Points:</label>
+          <input type="number" step="0.1" v-model="input.cp" class="form-control" id="cp" >
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="type">Type:</label>
+          <select v-model="input.type" class="form-control" id="type" >
+          <option value="" disabled>Select type</option>
+          <option value="core">Core</option>
+          <option value="system analysis">System Analysis</option>
+          <option value="software development">Software Development</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary mt-4">Update Unit</button>
+        </form>
+      </div>
+      <div class="col container-fluid w-50">
+        <h3>Output Message</h3>
+        <p>Status code: {{output.status}}</p>
+        <p>Response: {{output.response}}</p>
+      </div>
     </div>
-  `,
+    `,
   data() {
     return {
-      students: studMarks,
-      id: null,
+      input: { code: "", desc: "", cp: "", type: "" },
+      output: { status: "", response: "" },
     };
   },
-  created() {
-    this.id = this.$route.params.id;
+  methods: {
+    submitForm() {
+      this.output.status = "";
+      this.output.response = "";
+      if (!this.input.code) {
+        this.output.response = "Code field is  to update.";
+        return;
+      }
+      const payload = {
+        code: this.input.code,
+        desc: this.input.desc,
+        cp: parseFloat(this.input.cp),
+        type: this.input.type,
+      };
+      fetch(api + "/units", {
+        method: "UPDATE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            this.output.response = "Network response was not ok";
+          }
+          this.output.status = 200;
+          return response.json();
+        })
+        .then((data) => {
+          this.output.response = data;
+          console.log("Unit updated:", data);
+          this.input = { code: "", desc: "", cp: "", type: "" };
+        })
+        .catch((error) => {
+          this.output.status = "403";
+          this.output.response = "Failed to update unit. Please try again";
+        });
+    },
   },
 });
 
 app.component("DeleteUnit", {
   template: `
-    <div class="container">
-      <h2>Delete Unit</h2>
-      <p>Are you sure you want to delete {{ students[id].name }}?</p>
-      <!-- Delete confirmation button -->
+  <div class="row row-cols-6 w-auto">
+    <div class="col container-fluid w-50">
+      <h2 class="text-center">Delete Unit</h2>
+      <form @submit.prevent="submitForm">
+        <div class="form-group">
+          <label class="form-label" for="code">Enter Unit Code for deleting:</label>
+          <input type="text" v-model="input.code" class="form-control" id="code" >
+        </div>
+        <button type="submit" class="btn btn-primary mt-4">Delete Unit</button>
+        </form>
+      </div>
+      <div class="col container-fluid w-50">
+        <h3>Output Message</h3>
+        <p>Status code: {{output.status}}</p>
+        <p>Response: {{output.response}}</p>
+      </div>
     </div>
-  `,
+    `,
   data() {
     return {
-      students: studMarks,
-      id: null,
+      input: { code: "" },
+      output: { status: "", response: "" },
     };
   },
-  created() {
-    this.id = this.$route.params.id;
+  methods: {
+    submitForm() {
+      this.output.status = "";
+      this.output.response = "";
+      if (!this.input.code) {
+        this.output.response = "Code field is required.";
+        return;
+      }
+      const payload = {
+        code: this.input.code,
+      };
+      fetch(api + "/units", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      })
+        .then((response) => {
+          if (!response.ok) {
+            this.output.response = "Network response was not ok";
+          }
+          this.output.status = 200;
+          return response.json();
+        })
+        .then((data) => {
+          this.output.response = data;
+          console.log("Unit deleted:", data);
+          this.input = { code: "" };
+        })
+        .catch((error) => {
+          this.output.status = "403";
+          this.output.response = "Failed to delete unit. Please try again";
+        });
+    },
   },
 });
 const router = VueRouter.createRouter({
