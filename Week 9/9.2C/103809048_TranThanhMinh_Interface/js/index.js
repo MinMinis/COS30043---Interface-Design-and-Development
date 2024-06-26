@@ -1,33 +1,6 @@
 const api = "http://localhost:8080";
-var studMarks = [
-  { name: "John", marks: 80 },
-  { name: "Ally", marks: 75 },
-  { name: "Bob", marks: 60 },
-  { name: "Doe", marks: 85 },
-  { name: "Jane", marks: 90 },
-  { name: "Tom", marks: 70 },
-  { name: "Tim", marks: 65 },
-  { name: "Sam", marks: 55 },
-  { name: "Max", marks: 40 },
-  { name: "Kim", marks: 30 },
-  { name: "Jim", marks: 20 },
-  { name: "Zoe", marks: 10 },
-  { name: "Ron", marks: 5 },
-  { name: "Ben", marks: 0 },
-  { name: "Ken", marks: 100 },
-  { name: "Leo", marks: 95 },
-  { name: "Roy", marks: 85 },
-  { name: "Ray", marks: 75 },
-  { name: "Rex", marks: 65 },
-  { name: "Raj", marks: 55 },
-  { name: "Ria", marks: 45 },
-  { name: "Ric", marks: 35 },
-  { name: "Rid", marks: 25 },
-  { name: "Rim", marks: 15 },
-  { name: "Rin", marks: 10 },
-  { name: "Rit", marks: 5 },
-];
 const app = Vue.createApp({});
+// let authenticated = false;
 app.component("nav-bar", {
   template: `
     <ul class="nav nav-tabs my-4">
@@ -42,17 +15,12 @@ app.component("nav-bar", {
         </router-link>
       </li>
       <li class="nav-item">
-        <router-link to="/logout" class="nav-link" :class="{ 'active': $route.path === '/logout' }" @click="logout()" replace>
+        <router-link to="/logout" class="nav-link" :class="{ 'active': $route.path === '/logout' }" replace>
           Logout
         </router-link>
       </li>
     </ul>
   `,
-  methods: {
-    logout() {
-      this.$root.logout();
-    },
-  },
 });
 
 app.component("Login", {
@@ -92,6 +60,11 @@ app.component("Login", {
       },
     };
   },
+  // mounted() {
+  //   if (authenticated) {
+  //     this.$router.replace({ name: "Dashboard" });
+  //   }
+  // },
   methods: {
     login() {
       const { username, password } = this.input;
@@ -118,8 +91,7 @@ app.component("Login", {
             this.valid.message = "Invalid credentials";
             this.valid.status = false;
           } else if (data.success == true) {
-            // Assuming successful login, emit authenticated event and navigate to dashboard
-            this.$emit("authenticated", true);
+            // authenticated = true;
             this.$router.replace({ name: "Dashboard" });
           } else {
             this.valid.message = data.response;
@@ -134,7 +106,24 @@ app.component("Login", {
     },
   },
 });
-
+app.component("Logout", {
+  // I want to wait 3 seconds before redirecting to login
+  template: `
+    <div class="container">
+      <h2 class="text-center mt-5">Logging out...</h2>
+    </div>
+  `,
+  mounted() {
+    // if (authenticated) {
+    //   authenticated = false;
+    setTimeout(() => {
+      this.$router.replace({ name: "Login" });
+    }, 2000);
+    // } else {
+    //   this.$router.replace({ name: "Login" });
+    // }
+  },
+});
 app.component("Dashboard", {
   template: `
     <div class="container">
@@ -163,7 +152,13 @@ app.component("Dashboard", {
       <router-view></router-view>
     </div>
   `,
+  // mounted() {
+  //   if (!authenticated) {
+  //     this.$router.replace({ name: "Login" });
+  //   }
+  // },
 });
+app.component("paginate", VuejsPaginateNext);
 app.component("ViewUnits", {
   template: `
     <div class="container">
@@ -178,7 +173,7 @@ app.component("ViewUnits", {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(unit, index) in units" :key="index">
+          <tr v-for="(unit, index) in paginatedData" :key="index">
             <td>{{ unit.code }}</td>
             <td>{{ unit.desc }}</td>
             <td>{{ unit.cp }}</td>
@@ -186,14 +181,36 @@ app.component("ViewUnits", {
           </tr>
         </tbody>
       </table>
+      <paginate :page-count="pageCount" :page-range="3" :margin-pages="2" :click-handler="handlePageClick"
+      :prev-text="'Prev'" :next-text="'Next'" :container-class="'pagination'" :page-class="'page-item'"
+      :page-link-class="'page-link'" :prev-class="'page-item'" :next-class="'page-item'"
+      :prev-link-class="'page-link'" :next-link-class="'page-link'">
+      </paginate>
       <p class="alert-danger p-4 text-center my-2" v-if="error !== ''">{{error}}</p>
     </div>
   `,
   data() {
     return {
       units: [],
+      currentPage: 1,
+      perPage: 10,
       error: "",
     };
+  },
+  computed: {
+    pageCount() {
+      return Math.ceil(this.units.length / this.perPage);
+    },
+    paginatedData() {
+      const start = (this.currentPage - 1) * this.perPage;
+      const end = start + this.perPage;
+      return this.units.slice(start, end);
+    },
+  },
+  methods: {
+    handlePageClick(pageNum) {
+      this.currentPage = pageNum;
+    },
   },
   mounted() {
     this.error = "";
@@ -209,6 +226,8 @@ app.component("ViewUnits", {
           console.log("No data returned");
           this.error = "No data returned";
         } else {
+          // sort the data by code
+          data.sort((a, b) => a.code.localeCompare(b.code));
           this.units = data; // Assuming data is an array of units
         }
       })
@@ -486,7 +505,7 @@ const router = VueRouter.createRouter({
   history: VueRouter.createWebHashHistory(),
   routes: [
     { path: "/login", component: app.component("Login"), name: "Login" },
-    { path: "/logout", name: "Logout" },
+    { path: "/logout", name: "Logout", component: app.component("Logout") },
     {
       path: "/dashboard",
       component: app.component("Dashboard"),
