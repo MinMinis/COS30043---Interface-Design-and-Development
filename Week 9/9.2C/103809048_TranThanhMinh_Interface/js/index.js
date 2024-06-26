@@ -1,4 +1,4 @@
-const api = "http://localhost:8000";
+const api = "http://localhost:8080";
 var studMarks = [
   { name: "John", marks: 80 },
   { name: "Ally", marks: 75 },
@@ -66,11 +66,11 @@ app.component("Login", {
               <h5 class="card-title text-center">Login</h5>
               <form @submit.prevent="login">
                 <div class="mb-3">
-                  <label class="form-label" for="username" class="form-label">Username</label>
+                  <label class="form-label" for="username">Username</label>
                   <input type="text" class="form-control" id="username" v-model="input.username">
                 </div>
                 <div class="mb-3">
-                  <label class="form-label" for="password" class="form-label">Password</label>
+                  <label for="password" class="form-label">Password</label>
                   <input type="password" class="form-control" id="password" v-model="input.password">
                 </div>
                 <p class="alert-danger text-center" v-if="!valid.status">{{ valid.message }}</p>
@@ -92,10 +92,6 @@ app.component("Login", {
       },
     };
   },
-  mounted() {
-    console.log("hi");
-  },
-
   methods: {
     login() {
       const { username, password } = this.input;
@@ -118,16 +114,16 @@ app.component("Login", {
       fetch(api + "/login", requestLogin)
         .then((response) => response.json())
         .then((data) => {
-          if (data === null) {
+          if (data.success == false || data === null) {
             this.valid.message = "Invalid credentials";
             this.valid.status = false;
-          } else if (data.response) {
-            this.valid.message = data.response;
-            this.valid.status = false;
-          } else {
+          } else if (data.success == true) {
             // Assuming successful login, emit authenticated event and navigate to dashboard
             this.$emit("authenticated", true);
-            this.$router.replace({ name: "DashboardHome" });
+            this.$router.replace({ name: "Dashboard" });
+          } else {
+            this.valid.message = data.response;
+            this.valid.status = false;
           }
         })
         .catch((error) => {
@@ -172,7 +168,7 @@ app.component("ViewUnits", {
   template: `
     <div class="container">
       <h2>View Units</h2>
-      <table class="table table-bordered table-striped mt-5" v-if="units > 0">
+      <table class="table table-bordered table-striped mt-5" v-if="units.length > 0">
         <thead>
           <tr>
             <th>Code</th>
@@ -183,7 +179,7 @@ app.component("ViewUnits", {
         </thead>
         <tbody>
           <tr v-for="(unit, index) in units" :key="index">
-            <td>{{ unit.name }}</td>
+            <td>{{ unit.code }}</td>
             <td>{{ unit.desc }}</td>
             <td>{{ unit.cp }}</td>
             <td>{{ unit.type }}</td>
@@ -200,7 +196,6 @@ app.component("ViewUnits", {
     };
   },
   mounted() {
-    console.log("ViewUnits component mounted"); // Ensure this logs when the component is mounted
     this.error = "";
     fetch(api + "/units")
       .then((response) => {
@@ -226,38 +221,38 @@ app.component("ViewUnits", {
 
 app.component("CreateUnit", {
   template: `
-  <div class="row row-cols-6 w-auto">
-    <div class="col container-fluid w-50">
-      <h2 class="text-center">Create Unit</h2>
-      <form @submit.prevent="submitForm">
-        <div class="form-group">
-          <label class="form-label" for="code">Code:</label>
-          <input type="text" v-model="input.code" class="form-control" id="code" >
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="desc">Description:</label>
-          <input type="text" v-model="input.desc" class="form-control" id="desc" >
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="cp">Credit Points:</label>
-          <input type="number" step="0.1" v-model="input.cp" class="form-control" id="cp" >
-        </div>
-        <div class="form-group">
-          <label class="form-label" for="type">Type:</label>
-          <select v-model="input.type" class="form-control" id="type" >
-          <option value="" disabled>Select type</option>
-          <option value="core">Core</option>
-          <option value="system analysis">System Analysis</option>
-          <option value="software development">Software Development</option>
-          </select>
-        </div>
-        <button type="submit" class="btn btn-primary mt-4">Create Unit</button>
+    <div class="row row-cols-6 w-auto">
+      <div class="col container-fluid w-50">
+        <h2 class="text-center">Create Unit</h2>
+        <form @submit.prevent="createData">
+          <div class="form-group">
+            <label class="form-label" for="code">Code:</label>
+            <input type="text" v-model="input.code" class="form-control" id="code" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="desc">Description:</label>
+            <input type="text" v-model="input.desc" class="form-control" id="desc" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cp">Credit Points:</label>
+            <input type="number" step="0.1" v-model="input.cp" class="form-control" id="cp" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="type">Type:</label>
+            <select v-model="input.type" class="form-control" id="type" required>
+              <option value="" disabled>Select type</option>
+              <option value="Core">Core</option>
+              <option value="system analysis">System Analysis</option>
+              <option value="software development">Software Development</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary mt-4">Create Unit</button>
         </form>
       </div>
       <div class="col container-fluid w-50">
         <h3>Output Message</h3>
-        <p>Status code: {{output.status}}</p>
-        <p>Response: {{output.response}}</p>
+        <p>Status code: {{ output.status }}</p>
+        <p>Response: {{ output.response }}</p>
       </div>
     </div>
   `,
@@ -268,24 +263,27 @@ app.component("CreateUnit", {
     };
   },
   methods: {
-    submitForm() {
+    createData() {
       this.output.status = "";
       this.output.response = "";
+
       if (
         !this.input.code ||
         !this.input.desc ||
         !this.input.cp ||
         !this.input.type
       ) {
-        this.output.response = "All fields are .";
+        this.output.response = "All fields are required.";
         return;
       }
+
       const payload = {
         code: this.input.code,
         desc: this.input.desc,
         cp: parseFloat(this.input.cp),
         type: this.input.type,
       };
+
       fetch(api + "/units", {
         method: "POST",
         headers: {
@@ -293,26 +291,38 @@ app.component("CreateUnit", {
         },
         body: JSON.stringify(payload),
       })
-        .then((response) => {
+        .then(async (response) => {
           if (!response.ok) {
-            this.output.response = "Network response was not ok";
+            this.output.status = response.status;
+            const text = await response.text();
+            this.output.response = text || "Network response was not ok";
+            return;
           }
-          this.output.status = 200;
+          this.output.status = response.status;
           return response.json();
         })
         .then((data) => {
-          this.output.response = data;
-          console.log("Unit created:", data);
-          this.input = { code: "", desc: "", cp: "", type: "" };
+          if (data && data.success === false) {
+            this.output.status = "403";
+            this.output.response = data.message;
+          } else if (data && data.success === true) {
+            this.output.status = "200";
+            this.output.response = data.message;
+            this.input = { code: "", desc: "" };
+          } else {
+            this.output.status = "403";
+            this.output.response = "Failed to create unit. Please try again.";
+          }
         })
         .catch((error) => {
           this.output.status = "403";
-          this.output.response = "Failed to create unit. Please try again";
+          this.output.response =
+            error.message || "Failed to create unit. Please try again.";
         });
     },
   },
   mounted() {
-    this.input.type = "core";
+    this.input.type = "Core";
     this.input.cp = "12.5";
   },
 });
@@ -339,7 +349,7 @@ app.component("UpdateUnit", {
           <label class="form-label" for="type">Type:</label>
           <select v-model="input.type" class="form-control" id="type" >
           <option value="" disabled>Select type</option>
-          <option value="core">Core</option>
+          <option value="Core">Core</option>
           <option value="system analysis">System Analysis</option>
           <option value="software development">Software Development</option>
           </select>
@@ -375,7 +385,7 @@ app.component("UpdateUnit", {
         type: this.input.type,
       };
       fetch(api + "/units", {
-        method: "UPDATE",
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -389,9 +399,17 @@ app.component("UpdateUnit", {
           return response.json();
         })
         .then((data) => {
-          this.output.response = data;
-          console.log("Unit updated:", data);
-          this.input = { code: "", desc: "", cp: "", type: "" };
+          if (data && data.success === false) {
+            this.output.status = 403;
+            this.output.response = data.message;
+          } else if (data && data.success === true) {
+            this.output.status = 200;
+            this.output.response = data.message;
+            this.input = { code: "", desc: "", cp: "", type: "" };
+          } else {
+            this.output.status = 403;
+            this.output.response = "Failed to update unit. Please try again";
+          }
         })
         .catch((error) => {
           this.output.status = "403";
@@ -435,15 +453,8 @@ app.component("DeleteUnit", {
         this.output.response = "Code field is required.";
         return;
       }
-      const payload = {
-        code: this.input.code,
-      };
-      fetch(api + "/units", {
+      fetch(api + "/units/" + this.input.code, {
         method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
       })
         .then((response) => {
           if (!response.ok) {
@@ -453,9 +464,16 @@ app.component("DeleteUnit", {
           return response.json();
         })
         .then((data) => {
-          this.output.response = data;
-          console.log("Unit deleted:", data);
-          this.input = { code: "" };
+          if (data && data.success === false) {
+            this.output.status = 403;
+            this.output.response = data.message;
+          } else if (data && data.success === true) {
+            this.output.status = 200;
+            this.output.response = data.message;
+          } else {
+            this.output.status = 403;
+            this.output.response = "Failed to delete unit. Please try again";
+          }
         })
         .catch((error) => {
           this.output.status = "403";
