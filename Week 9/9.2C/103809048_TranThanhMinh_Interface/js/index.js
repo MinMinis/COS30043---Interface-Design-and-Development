@@ -226,9 +226,8 @@ app.component("ViewUnits", {
           console.log("No data returned");
           this.error = "No data returned";
         } else {
-          // sort the data by code
           data.sort((a, b) => a.code.localeCompare(b.code));
-          this.units = data; // Assuming data is an array of units
+          this.units = data;
         }
       })
       .catch((error) => {

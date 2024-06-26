@@ -90,7 +90,6 @@ app.put("/units", express.json(), (req, res) => {
     return;
   }
   const unit = db.prepare("SELECT * FROM units WHERE code = ?").get(code);
-  console.log(unit);
   if (!unit) {
     res.json({ success: false, message: "Unit not found" });
     return;

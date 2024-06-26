@@ -106,8 +106,8 @@ const app = Vue.createApp({
 
       if (!this.form.phone) {
         this.error.phone = "Phone is required";
-      } else if (!/^0\d{9}$/.test(this.form.phone)) {
-        this.error.phone = "Phone number must be 10 digits and start with 0";
+      } else if (!/^04\d{8}$/.test(this.form.phone)) {
+        this.error.phone = "Phone number must be 10 digits and start with 04";
       }
 
       if (!this.form.termsandcondition) {
