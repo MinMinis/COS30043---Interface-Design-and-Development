@@ -85,7 +85,9 @@ app.component("Login", {
 
       // Simulating login with fetch, replace with actual authentication logic
       fetch(api + "/login", requestLogin)
-        .then((response) => response.json())
+        .then((response) => {
+          return response.json();
+        })
         .then((data) => {
           if (data.success == false || data === null) {
             this.valid.message = "Invalid credentials";
@@ -223,7 +225,6 @@ app.component("ViewUnits", {
       })
       .then((data) => {
         if (data === null) {
-          console.log("No data returned");
           this.error = "No data returned";
         } else {
           data.sort((a, b) => a.code.localeCompare(b.code));
@@ -314,17 +315,14 @@ app.component("CreateUnit", {
             this.output.status = response.status;
             const text = await response.text();
             this.output.response = text || "Network response was not ok";
-            return;
           }
           this.output.status = response.status;
           return response.json();
         })
         .then((data) => {
           if (data && data.success === false) {
-            this.output.status = "403";
             this.output.response = data.message;
           } else if (data && data.success === true) {
-            this.output.status = "200";
             this.output.response = data.message;
             this.input = { code: "", desc: "" };
           } else {
@@ -413,15 +411,13 @@ app.component("UpdateUnit", {
           if (!response.ok) {
             this.output.response = "Network response was not ok";
           }
-          this.output.status = 200;
+          this.output.status = response.status;
           return response.json();
         })
         .then((data) => {
           if (data && data.success === false) {
-            this.output.status = 403;
             this.output.response = data.message;
           } else if (data && data.success === true) {
-            this.output.status = 200;
             this.output.response = data.message;
             this.input = { code: "", desc: "", cp: "", type: "" };
           } else {
@@ -478,18 +474,16 @@ app.component("DeleteUnit", {
           if (!response.ok) {
             this.output.response = "Network response was not ok";
           }
-          this.output.status = 200;
+          this.output.status = response.status;
           return response.json();
         })
         .then((data) => {
           if (data && data.success === false) {
-            this.output.status = 403;
             this.output.response = data.message;
           } else if (data && data.success === true) {
-            this.output.status = 200;
             this.output.response = data.message;
+            this.input = { code: "" };
           } else {
-            this.output.status = 403;
             this.output.response = "Failed to delete unit. Please try again";
           }
         })

@@ -61,32 +61,39 @@ app.get("/units", (req, res) => {
 
 app.post("/units", express.json(), (req, res) => {
   const { code, desc, cp, type } = req.body;
-  const unit = db.prepare("SELECT * FROM units WHERE code = ?").get(code);
+
+  // Validate request body
   if (!code || !desc || !cp || !type) {
-    res.json({ success: false, message: "All fields are required" });
-    return;
+    return res
+      .status(400)
+      .json({ success: false, message: "All fields are required" });
   }
+
+  // Check if unit code already exists
+  const unit = db.prepare("SELECT * FROM units WHERE code = ?").get(code);
   if (unit) {
-    res.json({ success: false, message: "Unit code already exists" });
-    return;
+    return res.json({ success: false, message: "Unit code already exists" });
   }
+
+  // Insert new unit
   const insertUnit = db.prepare(
     "INSERT INTO units (code, desc, cp, type) VALUES (?, ?, ?, ?)"
   );
   try {
     insertUnit.run(code, desc, cp, type);
-    res.json({
+    return res.json({
       success: true,
-      message: "Unit " + code + " " + desc + " successfully",
+      message: `Unit ${code} ${desc} successfully added`,
     });
   } catch (e) {
-    res.json({ success: false, message: e.message });
+    return res.status(500).json({ success: false, message: e.message });
   }
 });
+
 app.put("/units", express.json(), (req, res) => {
   let { code, desc, cp, type } = req.body;
   if (!code) {
-    res.json({ success: false, message: "Code field is required" });
+    res.status(400).json({ success: false, message: "Code field is required" });
     return;
   }
   const unit = db.prepare("SELECT * FROM units WHERE code = ?").get(code);
