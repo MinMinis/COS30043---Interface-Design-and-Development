@@ -2,6 +2,7 @@ const app = Vue.createApp({
   data() {
     return {
       data: [],
+      error: null,
     };
   },
   mounted() {
@@ -15,6 +16,7 @@ const app = Vue.createApp({
       })
       .catch((error) => {
         console.error("Error:", error);
+        this.error = error;
       });
   },
 });

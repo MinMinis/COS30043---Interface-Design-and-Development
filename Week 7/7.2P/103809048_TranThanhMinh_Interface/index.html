@@ -12,7 +12,9 @@
     <body>
         <div id="app" class="container">
             <h1>Units</h1>
-            <div class="table-responsive">
+            <p class="text-danger" v-if="error !== null">Fail to fetch data<br>
+            {{error}}</p>
+            <div class="table-responsive" v-if="error == null">
                 <table class="table table-scripted table-hover">
                     <thead>
                         <tr>
